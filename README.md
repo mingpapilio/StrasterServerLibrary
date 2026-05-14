@@ -16,8 +16,6 @@ FosterStorage is the shared storage server. It is intended for storing and organ
 ### Maintenance
 This section contains admin-facing notes for server setup, maintenance, troubleshooting, and future updates.
 
-- [Maintenance Notes](Maintenance/MaintenanceNotes_v1.md)
-
 ## Repository structure
 ```text
 StrasterServerLibrary/
