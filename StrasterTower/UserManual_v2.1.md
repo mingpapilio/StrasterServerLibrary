@@ -31,7 +31,7 @@
   - [4.1 Testing JupyterLab](#41-testing-jupyterlab)
   - [4.2 Basic linux commands](#42-basic-linux-commands)
   - [4.3 Monitoring the server](#43-monitoring-the-server)
-    - [4.3.1 Monitoring computation load htop and top](#431-monitoring-computation-load-htop-and-top)
+    - [4.3.1 Monitoring computational load (htop and top)](#431-monitoring-computational-load-htop-and-top)
     - [4.3.2 Monitoring GPU](#432-monitoring-gpu)
     - [4.3.3 Monitoring disc space](#433-monitoring-disc-space)
     - [4.3.4 Check server activity history](#434-check-server-activity-history)
@@ -237,7 +237,7 @@ unzip zipfile.zip
 ```
 
 ## 4.3 Monitoring the server
-### 4.3.1 Monitoring computation load (htop and top)
+### 4.3.1 Monitoring computational load (htop and top)
 
 ```bash
 # Open htop, a server monitor
