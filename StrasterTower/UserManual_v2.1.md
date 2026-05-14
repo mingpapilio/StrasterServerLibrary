@@ -32,8 +32,9 @@
   - [4.2 Basic linux commands](#42-basic-linux-commands)
   - [4.3 Monitoring the server](#43-monitoring-the-server)
     - [4.3.1 Monitoring computation load htop and top](#431-monitoring-computation-load-htop-and-top)
-    - [4.3.2 Monitoring disc space](#432-monitoring-disc-space)
-    - [4.3.3 Check server activity history](#433-check-server-activity-history)
+    - [4.3.2 Monitoring GPU](#432-monitoring-gpu)
+    - [4.3.3 Monitoring disc space](#433-monitoring-disc-space)
+    - [4.3.4 Check server activity history](#434-check-server-activity-history)
   - [4.4 Job management](#44-job-management)
     - [4.4.1 Submit jobs through tmux old section needs update](#441-submit-jobs-through-tmux-old-section-needs-update)
     - [4.4.2 Close inactive tmux sessions old section needs update](#442-close-inactive-tmux-sessions-old-section-needs-update)
@@ -256,7 +257,22 @@ q
 
 __Please Keep__ the CPU loading __BELOW 190__ to prevent the server from crashing (first number in *load average*). See [here](https://www.deonsworld.co.za/2012/12/20/understanding-and-using-htop-monitor-system-resources/) for some detailed explanation of htop.
 
-### 4.3.2 Monitoring disc space
+### 4.3.2 Monitoring GPU
+
+```bash
+# Open nvtop, a server monitor
+nvtop
+# Quit nvtop
+q
+```
+
+<p align="center">
+  <img src="images/nvtop.png" alt="nvtop" width="100%">
+</p>
+
+**Checking GPU activity with `nvtop`.** The `nvtop` display shows live GPU utilisation, GPU memory use, temperature, fan speed, power use, and active GPU-related processes. In this example, the NVIDIA RTX 4000 Ada GPU is mostly idle, with only light memory use by the graphical desktop processes.
+
+### 4.3.3 Monitoring disc space
 
 ```bash
 # For general and simple overview
@@ -274,7 +290,7 @@ q
 
 **Checking disk usage with `ncdu`.** The `ncdu` display shows how much storage each folder uses under `/drives/4tb`. Users can navigate with the arrow keys to identify large folders and manage their own files. This is useful for checking personal disk usage before adding large datasets or asking the server admin for help with storage cleanup.
 
-### 4.3.3 Check server activity history
+### 4.3.4 Check server activity history
 
 This one is a bit different, you need to open another local terminal tab and open the tool from browser.
 
