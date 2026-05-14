@@ -416,6 +416,12 @@ R CMD BATCH ../AnalysisCodes/Analysis2.R &
 R CMD BATCH ../AnalysisCodes/Analysis3.R &
 ## Remember to add '.libPaths(c(.libPaths(), "/drives/4tb/modules/R"))' to your analysis code files
 
+# An example of Matlab
+## Go to the folder that contain your script
+cd folder_with_codes
+## Launch the script named script.m
+matlab -batch "script" > script.log 2>&1 & 
+
 # close tmux
 exit
 ```
