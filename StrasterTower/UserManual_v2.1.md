@@ -11,6 +11,42 @@
 ---
 <br><br>
 
+## Table of contents
+
+- [1. About the Straster Tower](#1-about-the-straster-tower)
+  - [1.1 Drive structure and intended use](#11-drive-structure-and-intended-use)
+  - [1.2 The relationships between machines](#12-the-relationships-between-machines)
+
+- [2. Initialisation](#2-initialisation)
+  - [2.1 Get started](#21-get-started)
+    - [2.1.1 Configure your account](#211-configure-your-account)
+    - [2.1.2 Connect to the server](#212-connect-to-the-server)
+    - [2.1.3 Move to your personal folder](#213-move-to-your-personal-folder)
+
+- [3. Install essential applications](#3-install-essential-applications)
+  - [3.1 Install Miniconda/Miniforge](#31-install-minicondaminiforge)
+  - [3.2 Install JupyterLab](#32-install-jupyterlab)
+
+- [4. Useful commands and tools](#4-useful-commands-and-tools)
+  - [4.1 Testing JupyterLab](#41-testing-jupyterlab)
+  - [4.2 Basic linux commands](#42-basic-linux-commands)
+  - [4.3 Monitoring the server](#43-monitoring-the-server)
+    - [4.3.1 Monitoring computation load htop and top](#431-monitoring-computation-load-htop-and-top)
+    - [4.3.2 Monitoring disc space](#432-monitoring-disc-space)
+    - [4.3.3 Check server activity history](#433-check-server-activity-history)
+
+  - [4.4 Job management](#44-job-management)
+    - [4.4.1 Submit jobs through tmux old section needs update](#441-submit-jobs-through-tmux-old-section-needs-update)
+    - [4.4.2 Close inactive tmux sessions old section needs update](#442-close-inactive-tmux-sessions-old-section-needs-update)
+    - [4.4.3 Check active jobs](#443-check-active-jobs)
+    - [4.4.4 Check active connections](#444-check-active-connections)
+
+- [5. Example code scripts old section needs update](#5-example-code-scripts-old-section-needs-update)
+  - [5.1 The tab for jupyter connection](#51-the-tab-for-jupyter-connection)
+  - [5.2 The tab for ssh connections](#52-the-tab-for-ssh-connections)
+  - [Submitting parallel jobs from terminal with tmux](#submitting-parallel-jobs-from-terminal-with-tmux)
+
+---
 # 1. About the Straster Tower
 Our server was purchased under the ERC and Wellcome Trust fungings. Many thanks to Kevin, Mathew, and Laura for providing such a great computational resource! This document is intended to be a walk-through tutorial and toolbox. 
 
