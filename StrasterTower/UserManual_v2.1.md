@@ -34,7 +34,6 @@
     - [4.3.1 Monitoring computation load htop and top](#431-monitoring-computation-load-htop-and-top)
     - [4.3.2 Monitoring disc space](#432-monitoring-disc-space)
     - [4.3.3 Check server activity history](#433-check-server-activity-history)
-
   - [4.4 Job management](#44-job-management)
     - [4.4.1 Submit jobs through tmux old section needs update](#441-submit-jobs-through-tmux-old-section-needs-update)
     - [4.4.2 Close inactive tmux sessions old section needs update](#442-close-inactive-tmux-sessions-old-section-needs-update)
