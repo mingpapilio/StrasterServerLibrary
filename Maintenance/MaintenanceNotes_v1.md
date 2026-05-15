@@ -32,13 +32,13 @@ sudo nano /etc/motd
 ```
 ## 1.3 Emergency
 ```{bash eval=F}
-# Kill process with sudo access
-sudo pkill PROCESS_NAME
+# Kill a process with sudo access
+sudo pkill PROCESS_ID
 ```
 # 2. Adding users
 ## 2.1 StrasterTower
 ```bash
-sudo adduser @USER
+sudo adduser $USER
 # Assign people to user groups
 sudo /usr/local/sbin/assign_lab_group.sh ming foster
 ```
