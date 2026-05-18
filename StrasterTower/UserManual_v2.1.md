@@ -390,7 +390,6 @@ http://localhost:8080/monitorix
 
 # Close the ports
 lsof -ti:8888 | xargs kill -9
-lsof -ti:8787 | xargs kill -9
 lsof -ti:8080 | xargs kill -9
 ```
 
@@ -442,7 +441,7 @@ matlab -batch "script" > script.log 2>&1 &
 exit
 ```
 
-__Remember__ to close the inactive tmux sessions after jobs are completed:
+__The command below__ can close all inactive tmux sessions if jobs are completed:
 
 ```bash
 tmux kill-session -a
