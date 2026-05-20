@@ -3,8 +3,8 @@
 | Field | Details |
 |---|---|
 | Author | Ming Liu|
-| Last updated | 14 May 2026 |
-| Version | 1.0 |
+| Last updated | 20 May 2026 |
+| Version | 1.0.1 |
 | Scope | Notes for admin to manage servers |
 
 <br><br>
