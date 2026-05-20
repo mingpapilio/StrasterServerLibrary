@@ -90,3 +90,8 @@ sudo nano /etc/motd
 --------------------------------------------------------
 ```
 
+# 4. Upgrade and additional notes
+
+- The best RAM model: DDR5 ECC RDIMM (probably 4x128GB would be the best value over 8 sockets).
+- To check how many process a user can have: `cat /etc/security/limits.d/*.conf | grep -i nproc` (currently set to 2048 and 4096 for soft and hard limits)
+
