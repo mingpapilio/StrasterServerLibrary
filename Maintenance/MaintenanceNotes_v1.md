@@ -40,7 +40,7 @@ sudo pkill PROCESS_ID
 ```bash
 sudo adduser $USER
 # Assign people to user groups
-sudo /usr/local/sbin/assign_lab_group.sh ming foster
+sudo /usr/local/sbin/assign_lab_group.sh $USER $GROUP
 ```
 
 ## 2.2 FosterStorage
