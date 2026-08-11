@@ -119,11 +119,11 @@ sudo nano /etc/motd
 
 --------------------------------------------------------
 |                                                      |
-|           Welcome to Straster Tower Server!!         |
+|       ✨🎉  Welcome to Straster Tower!!  🎉✨        |
 |                                                      |
 |  A few reminders:                                    |
 |  - Please always change directory by                 |
-|                cd /drives/4tb/username               |
+|                cd /drives/4tb/$USER               |
 |  - DO NOT install any R packages yourself (contact   |
 |    Ming or Laura and we will do it for you)          |
 |  - Contact us whenever you are adding large files    |
