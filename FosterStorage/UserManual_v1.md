@@ -63,7 +63,7 @@ Here is a brief description for the intention of each foler:
 
 Because FosterStorage is behind StrasterTower, users connect by creating an SSH tunnel from their personal computer.
 
-### 3.1 The tunnel forwards
+### 3.1 Establish the tunnel
 Replace `$USER` with your StrasterTower username.
 ```bash
 ssh -N -f -o ExitOnForwardFailure=yes -L 1445:192.168.50.10:445 $USER@strastertower.path.ox.ac.uk
@@ -82,7 +82,7 @@ smb://localhost:1445/FosterStorage
 
 Use your SMB username and password when prompted.
 
-### 3.2 Stop the tunnel
+### 3.2 Close the tunnel
 ```bash
 lsof -tiTCP:1445 -sTCP:LISTEN | xargs kill
 ```
