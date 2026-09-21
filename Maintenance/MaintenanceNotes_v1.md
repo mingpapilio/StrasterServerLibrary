@@ -3,8 +3,8 @@
 | Field | Details |
 |---|---|
 | Author | Ming Liu|
-| Last updated | 11 Aug 2026 |
-| Version | 1.0.2 |
+| Last updated | 21 Sep 2026 |
+| Version | 1.0.3 |
 | Scope | Notes for admin to manage servers |
 
 <br><br>
@@ -35,6 +35,17 @@ sudo nano /etc/motd
 # Kill a process with sudo access
 sudo pkill PROCESS_ID
 ```
+
+## 1.4 Password reset
+```{bash eval=F}
+# List all users
+awk -F: -v min="$(awk '/^UID_MIN/ {print $2}' /etc/login.defs)" \
+'$3 >= min && $3 < 65534 {printf "%-20s UID=%-6s HOME=%-25s SHELL=%s\n", $1, $3, $6, $7}' /etc/passwd
+
+# Reset password
+sudo passwd $USER
+```
+
 # 2. Adding users
 ## 2.1 StrasterTower
 ```bash
