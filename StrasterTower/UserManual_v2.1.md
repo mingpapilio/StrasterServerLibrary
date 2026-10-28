@@ -3,9 +3,9 @@
 
 | Field | Details |
 |---|---|
-| Author | Ming Liu and Laura de Nies|
-| Last updated | 14 May 2026 |
-| Version | 2.1 |
+| Author | Ming Liu|
+| Last updated | 28 Oct 2026 |
+| Version | 2.2 |
 | Scope | User guide for accessing and using StrasterTower |
 
 ---
@@ -36,16 +36,19 @@
     - [4.3.3 Monitoring disc space](#433-monitoring-disc-space)
     - [4.3.4 Check server activity history](#434-check-server-activity-history)
   - [4.4 Job management](#44-job-management)
-    - [4.4.1 Submit jobs through tmux old section needs update](#441-submit-jobs-through-tmux-old-section-needs-update)
-    - [4.4.2 Close inactive tmux sessions old section needs update](#442-close-inactive-tmux-sessions-old-section-needs-update)
-    - [4.4.3 Check active jobs](#443-check-active-jobs)
-    - [4.4.4 Check active connections](#444-check-active-connections)
+    - [4.4.1 Choosing how to run a job](#441-choosing-how-to-run-a-job)
+    - [4.4.2 Keep sessions running with tmux](#442-keep-sessions-running-with-tmux)
+    - [4.4.3 Check processes and connections](#443-check-processes-and-connections)
+    - [4.4.4 Run a computation with srun (optionally inside tmux)](#444-run-a-computation-with-srun-optionally-inside-tmux)
+    - [4.4.5 Monitor and cancel Slurm jobs](#445-monitor-and-cancel-slurm-jobs)
+    - [4.4.6 Submit unattended jobs with sbatch](#446-submit-unattended-jobs-with-sbatch)
 
-- [5. Example code scripts old section needs update](#5-example-code-scripts-old-section-needs-update)
-  - [5.1 The tab for jupyter connection](#51-the-tab-for-jupyter-connection)
-  - [5.2 The tab for ssh connections](#52-the-tab-for-ssh-connections)
-  - [Submitting parallel jobs from terminal with tmux](#submitting-parallel-jobs-from-terminal-with-tmux)
-
+- [5. Example code scripts](#5-example-code-scripts)
+  - [5.1 Launch JupyterLab](#51-launch-jupyterlab)
+  - [5.2 SSH connections for JupyterLab and Monitorix](#52-ssh-connections-for-jupyterlab-and-monitorix)
+  - [5.3 Launch independent scripts in parallel with tmux](#53-launch-independent-scripts-in-parallel-with-tmux)
+  - [5.4 Add resource management with srun](#54-add-resource-management-with-srun)
+  - [5.5 Submit an unattended job with sbatch](#55-submit-an-unattended-job-with-sbatch)
 ---
 # 1. About the Straster Tower
 Our server was purchased under the ERC and Wellcome Trust fungings. Many thanks to Kevin, Mathew, and Laura for providing such a great computational resource! This document is intended to be a walk-through tutorial and toolbox. 
@@ -307,142 +310,315 @@ localhost:8080/monitorix
 **Monitoring server activity with `Monitorix`.** `Monitorix` provides a browser-based summary of recent server activity, including system load, active processes, memory use, kernel usage, and other system-level metrics. It is useful for reviewing server behaviour over time, especially when diagnosing heavy workloads or checking whether a large job has caused sustained high load.
 
 ## 4.4 Job management
-### 4.4.1 Submit jobs through tmux (old section, needs update)
+
+There are several ways to run programs on StrasterTower. **`tmux` keeps a terminal session available after an SSH disconnection; Slurm (`srun`) schedules commands with a requested allocation of computational resources.** You can use either tool independently or combine them. This section explains the tools; [Section 5](#5-example-code-scripts) provides complete scripts and parallel-processing examples.
+
+### 4.4.1 Choosing how to run a job
+
+| I want to... | Suggested approach |
+|---|---|
+| Browse files, edit code, or run a short, predictable command | Ordinary SSH terminal |
+| Keep my terminal available after disconnecting | `tmux` |
+| Run unfamiliar or demanding software with an explicit resource request | `srun` |
+| Keep a resource-managed command running when I disconnect | `tmux` + `srun` |
+| Submit a longer, unattended job | `sbatch` |
+
+**Rule of thumb:** Prefer `srun` for exploratory programs or third-party packages whose resource requirements are uncertain, even if you expect them to finish quickly. For simple, well-understood scripts, an ordinary terminal or tmux session may be sufficient.
+
+### 4.4.2 Keep sessions running with tmux
+
+`tmux` lets you create a terminal session that you can detach from and return to later. It is particularly useful for jobs that should continue after you disconnect from SSH.
 
 ```bash
-# Starting a tmux session
-tmux
-# Run some task (the '&' symbol lets the system creates a task ID and allows you to run multiple things at the same time.)
-python file.py &
-R CMD BATCH file.R &
-./a.out &
-# Quit tmux
+# Start a named session
+tmux new -s analysis
+
+# Inside tmux, run your program as usual
+python analysis.py
+
+# When your work is finished, close the session
 exit
 ```
+
+If you need to disconnect **while your program is still running**, press **Ctrl+B, then D** to detach without interrupting the session. You can later reconnect via SSH and resume your work:
+
+```bash
+# List your sessions
+tmux list-sessions
+
+# Reattach to the named session
+tmux attach -t analysis
+```
+
+After your work has finished, use `exit` inside tmux to close the session. Alternatively, from another terminal, you can close a particular session with `tmux kill-session -t analysis` (do not do this if it contains work you need to keep running).
 
 <p align="center">
   <img src="images/tmux.png" alt="tmux" width="60%">
 </p>
 
+**tmux terminal session.** A session can be detached and reattached without restarting its programs.
 
-`TMUX` is useful when your program is terminated when SSH is disconnected from the server, TMUX make sure the session is free from the interference by SSH. Please see this [ask ububtu page](https://askubuntu.com/questions/8653/how-to-keep-processes-running-after-ending-ssh-session) for more information. __Please always check the current computation load before you submit jobs (with top or htop).__
+**Detach vs exit:** Detaching preserves the session so that you can return to unfinished work; `exit` closes the current shell, and the tmux session normally ends when its last pane closes. **Use `exit` when finished and detach only when you need to disconnect before completion.** Please close completed sessions rather than leaving them inactive.
 
-### 4.4.2 Close inactive tmux sessions (old section, needs update)
+### 4.4.3 Check processes and connections
 
-```bash
-# List current sessions
-tmux list-sessions
-# Kill session
-tmux kill-session -t [session name]
-# Kill all sessions
-tmux kill-session -a
-# You can also customise a session name
-tmux new -s [session-name]
-```
-
-Please close the inactive tmux sessions to avoid lots of active connections to the server (each tmux session would be treated as a user).
-
-### 4.4.3 Check active jobs
+Use `ps` to inspect processes belonging to your account, including programs launched through tmux or Slurm. Use `who` to see logged-in terminal sessions.
 
 ```bash
-ps -u $USER
-```
+# Show your processes and their elapsed time, CPU and memory use
+ps -u "$USER" -o pid,etime,%cpu,%mem,cmd
 
+# Show logged-in terminal sessions
+who
+```
 <p align="center">
   <img src="images/ps_u.png" alt="tmux" width="60%">
 </p>
 
-### 4.4.4 Check active connections
-
-```bash
-who
-```
+**Checking processes with `ps`.** Use this to identify programs running under your account.
 
 <p align="center">
   <img src="images/who.png" alt="tmux" width="60%">
 </p>
 
-# 5. Example code scripts (old section, needs update)
-## 5.1 The tab for jupyter connection
+**Checking logins with `who`.** This lists terminal login sessions rather than every network connection. A tmux session is not an additional Linux user.
+
+For a live view of computational load, see [`htop` in Section 4.3.1](#431-monitoring-computational-load-htop-and-top); for activity history, see [Monitorix in Section 4.3.4](#434-check-server-activity-history).
+
+### 4.4.4 Run a computation with srun (optionally inside tmux)
+
+Slurm schedules programs according to their requested resources. With `srun`, you can run familiar Python, R, or bioinformatics commands without modifying the underlying code.
 
 ```bash
-ssh $USER@strastertower.path.ox.ac.uk
+# Example: run one Python program requesting two CPUs and 4 GB RAM
+srun --ntasks=1 --cpus-per-task=2 --mem=4G python analysis.py
+```
+
+| Option | Meaning |
+|---|---|
+| `--ntasks=1` | Start one instance of the program |
+| `--cpus-per-task=2` | Request two CPUs for that task |
+| `--mem=4G` | Request 4 GB RAM for the job |
+
+These values are **examples**, not fixed allocations for every user. If sufficient resources are not currently available, Slurm may wait before starting the command. Note that requesting multiple CPUs does not automatically make a single-threaded program parallel; where relevant, match your software's thread setting to the CPUs requested.
+
+**Combining with tmux:** Start or reattach to a tmux session as described in 4.4.2, and run the `srun` command *inside* that session. You can detach while the command is running and reconnect later. This lets tmux handle terminal persistence while Slurm handles resource allocation. For a complete parallel-processing example using both tools, see [Section 5.4](#54-add-resource-management-with-srun).
+
+For ordinary analyses, running individual commands with `srun` is usually simpler than keeping a Slurm interactive shell open. The latter is possible (for example, with `srun --pty bash`), but an allocation remains occupied while that shell is open, including idle periods. Please also see the [official `srun` documentation](https://slurm.schedmd.com/srun.html) for additional options.
+
+### 4.4.5 Monitor and cancel Slurm jobs
+
+Use `squeue` to inspect running or pending Slurm jobs, and `scancel` to stop a job you no longer need.
+
+```bash
+# Show your jobs
+squeue -u "$USER"
+
+# Show the status of one job (replace 12345 with its ID)
+squeue -j 12345
+
+# Cancel a job
+scancel 12345
+```
+
+Common states include `PD` (pending), `R` (running), and `CG` (completing). Completed jobs disappear from `squeue`; disappearance does not necessarily indicate success. If Slurm accounting is available, you can check the outcome afterwards:
+
+```bash
+sacct -j 12345 --format=JobID,State,ExitCode
+```
+
+For scripts launched with ordinary Bash `&`, use `jobs`, `ps`, or `htop` instead: they do not appear in `squeue` unless launched through Slurm.
+
+### 4.4.6 Submit unattended jobs with sbatch
+
+`sbatch` is useful when a program should run independently of a terminal session. It submits a shell script to Slurm, which schedules the job and writes output to a log file. A batch job continues after your SSH connection closes.
+
+```bash
+# Submit a batch script containing #SBATCH directives
+sbatch job.sh
+
+# Then inspect the submitted job with squeue
+```
+
+A small, copyable batch example is in [Section 5.5](#55-submit-an-unattended-job-with-sbatch). For more detail, see the [official `sbatch` documentation](https://slurm.schedmd.com/sbatch.html).
+
+# 5. Example code scripts
+
+This section provides **complete command-line examples** for common tasks on StrasterTower. Sections 5.1-5.3 preserve familiar JupyterLab, SSH, tmux and parallel-script workflows. Section 5.4 shows how to add `srun` to similar computations, and 5.5 introduces unattended submission through `sbatch`.
+
+The commands assume that you have connected to the server, selected the relevant working directory, and installed the software used in each example. Adapt filenames, folders and package environments to your own project.
+
+## 5.1 Launch JupyterLab
+
+The following commands run on **StrasterTower**, after you connect through SSH. Activate the Conda environment in which JupyterLab is installed.
+
+```bash
+# On StrasterTower
 cd /drives/4tb/$USER
-jupyter lab --port=8888
-# Ctrl + C to stop JupyterLab
-# Ctrl + D to disconnect from ssh
+
+# Activate your environment if necessary
+# conda activate your_environment
+
+jupyter lab --no-browser --ip=127.0.0.1 --port=8888
 ```
 
-## 5.2 The tab for ssh connections
+The terminal will display a local URL containing an access token. Keep JupyterLab running, then follow [Section 5.2](#52-ssh-connections-for-jupyterlab-and-monitorix) to open it from your own computer. Stop JupyterLab with **Ctrl+C** when finished. For screenshots and more detail, see [Section 4.1](#41-testing-jupyterlab).
+
+## 5.2 SSH connections for JupyterLab and Monitorix
+
+Open a **new terminal on your own computer**, not on StrasterTower. Use SSH port forwarding to access services running on the server.
 
 ```bash
-# Activate connections
-## For jupyter lab
-ssh -N -f -L 8888:localhost:8888 $USER@strastertower.path.ox.ac.uk
-## For monitorix (server activity monitor)
-ssh -N -f -L 8080:localhost:8080 $USER@strastertower.path.ox.ac.uk
-
-# In the browser
-## For jupyter lab
-http://localhost:8888/lab?token=........
-## For monitorix
-http://localhost:8080/monitorix
-
-# Close the ports
-lsof -ti:8888 | xargs kill -9
-lsof -ti:8080 | xargs kill -9
+# JupyterLab tunnel (on your local computer)
+ssh -N -L 8888:127.0.0.1:8888 $USER@strastertower.path.ox.ac.uk
 ```
 
-I would highly recommend you to copy the entire chunk of codes for daily uses, because closing port (i.e., lsof) can prevent causing problem on the local machine. Also, please properly turn off connections and terminate Jupyter to reduce server traffic and keep the dead connection as low as possible. In other words, __please do not close your laptop while still connected to the server!__
-
-## Submitting parallel jobs from terminal with tmux
+If you also want to view Monitorix:
 
 ```bash
-# Wait until tmux has been activated
-tmux
+# Monitorix tunnel (on your local computer)
+ssh -N -L 8080:127.0.0.1:8080 $USER@strastertower.path.ox.ac.uk
+```
 
-# An example of C
-## Compile the script
-gcc code.c -lm -O2
-## Copy complied file (a.out) to all sub-folders
-for d in */; do cp a.out "$d"; done
-## Submit the jobs
-cd folder_1
-## Put '&' to return to terminal command line, the system will generate a job id for the submitted task
-./a.out x=0 &
-cd ../folder_2
-./a.out x=1 &
+Replace `$USER` with your server username. In your local browser, open:
 
-# An example of Python
-## Copy python script to all sub-folders
-for d in */; do cp code.py "$d"; done
-## Suubmit the jobs
-cd folder_1
-python code.py a=0 b=0 &
-cd ../folder_2
-python code.py a=0 b=1 &
+- **JupyterLab:** `http://localhost:8888/lab?token=...` (paste the token from the JupyterLab terminal)
+- **Monitorix:** `http://localhost:8080/monitorix`
 
-# An example of R
-## Go to the folder containing the files you want to do some analysis
+These SSH tunnels run in the foreground, so pressing **Ctrl+C** in their local terminal closes the relevant connection. You can alternatively use the background `ssh -N -f -L` method described in Section 4.1, but then close the particular SSH process when finished. Avoid killing every process associated with a port, since some may be unrelated. See [Section 4.3.4](#434-check-server-activity-history) for more about Monitorix.
+
+## 5.3 Launch independent scripts in parallel with tmux
+
+A simple way to run multiple independent programs is to open a tmux session and append `&` to each command. The `&` tells Bash to run that command in the background, allowing you to launch another one without opening a new terminal. It does **not** schedule the jobs or allocate resources; check the server load before starting several processes.
+
+Start tmux in your working directory:
+
+```bash
+cd /drives/4tb/$USER
+
+tmux new -s parallel
+```
+
+The following examples are **alternatives for different programming languages**; choose the one relevant to your project. They assume the indicated folders and code files already exist.
+
+**C - Compile once and execute in separate folders**
+
+```bash
+# Compile in the directory containing code.c
+gcc code.c -lm -O2 -o simulation
+
+# Copy the executable to two experiment folders
+for d in folder_1 folder_2; do cp simulation "$d/"; done
+
+# Run both copies in the background, with separate logs
+(cd folder_1 && ./simulation x=0 > run.log 2>&1) &
+(cd folder_2 && ./simulation x=1 > run.log 2>&1) &
+```
+
+**Python - Run the same script with different arguments**
+
+```bash
+# Copy the script to each experiment folder
+for d in folder_1 folder_2; do cp code.py "$d/"; done
+
+# Run independent analyses in parallel
+(cd folder_1 && python code.py a=0 b=0 > run.log 2>&1) &
+(cd folder_2 && python code.py a=0 b=1 > run.log 2>&1) &
+```
+
+**R - Run several analysis scripts**
+
+```bash
+# From your folder containing the input data
 cd folder_with_data
-## Launch the analysis in parallel
+
 R CMD BATCH ../AnalysisCodes/Analysis1.R &
 R CMD BATCH ../AnalysisCodes/Analysis2.R &
 R CMD BATCH ../AnalysisCodes/Analysis3.R &
-## Remember to add '.libPaths(c(.libPaths(), "/drives/4tb/modules/R"))' to your analysis code files
+```
 
-# An example of Matlab
-## Go to the folder that contain your script
-cd folder_with_codes
-## Launch the script named script.m
-matlab -batch "script" > script.log 2>&1 & 
+`R CMD BATCH` normally writes an `.Rout` file for each script. If your R code relies on the shared package library, retain the relevant `.libPaths()` setting used by your project (for example, `/drives/4tb/modules/R`).
 
-# close tmux
+**MATLAB - Run a script non-interactively**
+
+```bash
+# From the directory containing script.m
+matlab -batch "script" > script.log 2>&1 &
+```
+
+To inspect and finish background work in **the same tmux shell**:
+
+```bash
+# List background jobs started from this shell
+jobs -l
+
+# Wait until all of these background jobs finish
+wait
+```
+
+Use `jobs -l` to inspect background processes and `wait` to wait until they have finished. Check their output files to confirm that the analyses completed successfully. Then close the tmux session:
+
+```bash
 exit
 ```
 
-__The command below__ can close all inactive tmux sessions if jobs are completed:
+If you need to disconnect **before** the jobs finish, detach with **Ctrl+B, then D** and reconnect later to check their progress.
+
+For job status and server activity, you can also use `ps`, `htop`, and Monitorix ([Sections 4.4.3](#443-check-processes-and-connections) and [4.3](#43-monitoring-the-server)).
+
+## 5.4 Add resource management with srun
+
+You do not need to rewrite the examples in Section 5.3 to use Slurm. Instead, place `srun` and the resource request before the program you want to launch. The underlying Python, R, C or MATLAB code stays the same.
+
+For example, inside an existing tmux session:
 
 ```bash
-tmux kill-session -a
+# One Python analysis, requesting two CPUs and 4 GB RAM
+srun --ntasks=1 --cpus-per-task=2 --mem=4G python code.py a=0 b=0
 ```
+
+You can also start **several independent `srun` commands** in the background. Slurm handles their scheduling instead of relying solely on your choice of how many processes to start at once:
+
+```bash
+# From the directory containing folder_1 and folder_2
+(cd folder_1 && srun --ntasks=1 --cpus-per-task=2 --mem=4G python code.py a=0 b=0 > run.log 2>&1) &
+(cd folder_2 && srun --ntasks=1 --cpus-per-task=2 --mem=4G python code.py a=0 b=1 > run.log 2>&1) &
+
+# Wait for both submission commands to finish
+wait
+```
+
+This is the same folder-based pattern as Section 5.3, now using an explicit resource request for each computation. The values are illustrative: choose appropriate CPU and RAM requests for your actual program. If a package has a threading option, keep its thread count consistent with the CPU request.
+
+**A bioinformatics example.** If FastQC is installed in your environment, its thread setting can be combined with Slurm's CPU request:
+
+```bash
+srun --ntasks=1 --cpus-per-task=2 --mem=4G \
+    fastqc --threads 2 reads_R1.fastq.gz reads_R2.fastq.gz
+```
+
+To make the workflow persistent, start tmux **before** launching these commands, and detach if you need to disconnect while the jobs are running. When you return, reattach using `tmux attach -t parallel`, inspect the output logs, and use `squeue -u "$USER"` to see jobs still being managed by Slurm. Once all computations have finished, use `exit` to close the tmux session. See [Section 4.4.4](#444-run-a-computation-with-srun-optionally-inside-tmux) for an explanation of the Slurm options.
+
+## 5.5 Submit an unattended job with sbatch
+
+For an analysis that should run independently of your terminal, create a small shell script called `job.sh`:
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=analysis
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=4G
+#SBATCH --output=analysis-%j.out
+
+python analysis.py
+```
+
+Submit the script from your working directory:
+
+```bash
+sbatch job.sh
+squeue -u "$USER"
+```
+
+Slurm returns a job ID and writes the program output to a file such as `analysis-12345.out`. You can disconnect from SSH after submission without stopping the batch job. For a larger collection of independent samples, Slurm also supports [job arrays](https://slurm.schedmd.com/job_array.html), but the tmux and `srun` examples above are sufficient for many everyday workflows.
