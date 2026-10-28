@@ -5,7 +5,7 @@
 |---|---|
 | Author | Ming Liu|
 | Last updated | 28 Oct 2026 |
-| Version | 2.2 |
+| Version | 2.1.1 |
 | Scope | User guide for accessing and using StrasterTower |
 
 ---
