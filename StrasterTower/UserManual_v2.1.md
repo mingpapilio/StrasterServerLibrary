@@ -78,11 +78,11 @@ In general:
 
 The folder layout is organised as follows:
 
-- Personal work folder on the 4 TB drive: `/drives/4tb/<your_username>`
+- Personal work folder on the 4 TB drive: `/drives/4tb/$USER`
 - Shared folder on the 4 TB drive: `/drives/4tb/shared`
 - Personal work folder on the relevant 12 TB drive:
-  - `/drives/12tb_foster/<your_username>` or
-  - `/drives/12tb_stracy/<your_username>`
+  - `/drives/12tb_foster/$USER` or
+  - `/drives/12tb_stracy/$USER`
 - Shared group folder on the relevant 12 TB drive:
   - `/drives/12tb_foster/shared` or
   - `/drives/12tb_stracy/shared`
