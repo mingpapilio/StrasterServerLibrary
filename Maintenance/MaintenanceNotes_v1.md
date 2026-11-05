@@ -91,7 +91,15 @@ cmd.exe /c "net use \\192.168.X.10\FosterStorage /delete /y"
 
 The shortcuts do not store passwords. Samba sessions end after using the logout shortcut or rebooting/logging out of Windows. Each computer must use its corresponding FosterStorage IP.
 
-# 4. View FosterStorage authentication records
+# 4. View users' past activities 
+
+## 4.1 Login records
+Show the last 10 sessions (change 10 to other numbers, or just `last` for the full history since the beginning)
+
+```bash
+last -n 10
+```
+## 4.2 Authentication records on Samba
 
 ~~~bash
 sudo grep -Rh '^  Auth:' /var/log/samba/log.* | perl -ne '
